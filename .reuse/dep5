@@ -1,0 +1,40 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Oxyde Desktop Environment
+Upstream-Contact: Oxyde Maintainers <maintainers@oxyde.dev>
+Source: https://github.com/<you>/oxyde
+
+Files: *
+Copyright: 2025 Oxyde Contributors
+License: MPL-2.0
+
+Files: crates/** assets/icons/** assets/wallpapers/** docs/** examples/**
+Copyright: 2025 Oxyde Contributors
+License: MPL-2.0
+
+# ── Documentation ───────────────────────────────────────────────────────────────
+Files: docs/** README.md CONTRIBUTING.md .github/**
+Copyright: 2025 Oxyde Contributors
+License: CC-BY-4.0
+
+# ── Icons & Artwork (vector/bitmap) ────────────────────────────────────────────
+Files: assets/icons/** assets/branding/**
+Copyright: 2025 Oxyde Contributors
+License: CC-BY-SA-4.0
+
+# ── Wallpapers & Screenshots ───────────────────────────────────────────────────
+Files: assets/wallpapers/** assets/screenshots/**
+Copyright: 2025 Oxyde Contributors
+License: CC-BY-4.0
+
+# ── Fonts (if you ship any) ───────────────────────────────────────────────────
+Files: assets/fonts/**
+Copyright: 2025 Respective Authors
+License: OFL-1.1
+
+# ── Third-party vendored code (example) ────────────────────────────────────────
+Files: third_party/somecrate/**
+Copyright: 2019-2022 Some Author <author@example.com>
+License: Apache-2.0
+
+# If you bundle any SPDX-unrecognized or custom licenses, point to LICENSES/*.txt
+# and name them with an SPDX-like identifier used consistently below.
