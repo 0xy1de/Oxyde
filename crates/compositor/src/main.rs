@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 Oxyde Contributors
+//
+// SPDX-License-Identifier: MPL-2.0
+
 fn main() {
     println!("Oxyde compositor starting...");
     oxyde_panel::init();
