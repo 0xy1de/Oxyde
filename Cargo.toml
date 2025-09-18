@@ -1,0 +1,14 @@
+[workspace]
+members = [
+  "crates/compositor",
+  "crates/panel",
+  "crates/dock",
+  "crates/expose",
+  "crates/launcher",
+  "crates/oxykeys",
+  "crates/oxymenu",
+  "crates/oxynotify",
+  "crates/oxyconfig",
+  "crates/theming",
+]
+resolver = "2"

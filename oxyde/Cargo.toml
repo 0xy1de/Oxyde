@@ -1,0 +1,11 @@
+[package]
+name = "oxyde"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+smithay = "0.3"
+calloop = "0.12"
+
+[workspace]
+members = ["crates/compositor"]

@@ -1,0 +1,19 @@
+[package]
+name = "oxyde_compositor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+oxyde_panel     = { path = "../panel" }
+oxyde_theming   = { path = "../theming" }
+oxyde_oxynotify = { path = "../oxynotify" }
+oxyde_oxymenu   = { path = "../oxymenu" }
+oxyde_oxykeys   = { path = "../oxykeys" }
+oxyde_oxyconfig = { path = "../oxyconfig" }
+oxyde_launcher  = { path = "../launcher" }
+oxyde_expose    = { path = "../expose" }
+oxyde_dock      = { path = "../dock" }
+
+[[bin]]
+name = "compositor"
+path = "src/main.rs"
