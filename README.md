@@ -11,7 +11,7 @@ all while staying **lightweight, safe, and optimized for workflow**.
 ---
 
 <p align="center">
-  <img src="/assets/icons/logo.png" alt="Oxyde Logo" width="200"/>
+  <img src="/assets/icons/logo.png" alt="Oxyde Logo"/>
 </p>
 
 ---
