@@ -1,7 +1,7 @@
 # 🌌 Oxyde — A Modern Frutiger Aero Desktop Environment in Rust
 
 [![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
-[![REUSE status](https://api.reuse.software/badge/github.com/<your-username>/oxyde)](https://api.reuse.software/info/github.com/<your-username>/oxyde)
+[![REUSE status](https://api.reuse.software/badge/github.com/0xy1de/oxyde)](https://api.reuse.software/info/github.com/0xy1de/oxyde)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/<your-username>/oxyde/ci.yml?branch=main)](https://github.com/<your-username>/oxyde/actions)
 
 Oxyde is a **next-generation desktop environment** written in Rust.  
