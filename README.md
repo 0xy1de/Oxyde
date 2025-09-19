@@ -75,13 +75,13 @@ Prerequisites
 ## Build & Run
 
 ```bash
-git clone https://github.com/<your-username>/oxyde.git
+git clone https://github.com/0xy1de/oxyde.git
 ```
 ```bash
 cd oxyde
 ```
 ```bash
-cargo run --bin compositor
+cargo run --bin oxyde_compositor
 ```
 
 
