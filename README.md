@@ -10,6 +10,19 @@ all while staying **lightweight, safe, and optimized for workflow**.
 
 ---
 
+<p align="center">
+  <img src="/assets/icons/logo.png" alt="Oxyde Logo" width="200"/>
+</p>
+
+---
+
+# Project Mockup:
+<p>
+  <img src="/assets/oxyde_reender.png" alt="Oxyde Render Mockup"/>
+</p>
+
+---
+
 ## ✨ Features (planned)
 
 - 🖥 **Wayland compositor** powered by [smithay](https://github.com/Smithay/smithay)  
