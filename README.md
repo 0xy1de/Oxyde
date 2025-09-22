@@ -1,144 +1,32 @@
-# 🌌 Oxyde — A Modern Frutiger Aero Desktop Environment in Rust
+# Oxyde RT  
+### Oxyde Retro Technology  
 
-[![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
-[![REUSE status](https://api.reuse.software/badge/github.com/0xy1de/oxyde)](https://api.reuse.software/info/github.com/0xy1de/oxyde)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/<your-username>/oxyde/ci.yml?branch=main)](https://github.com/<your-username>/oxyde/actions)
-
-Oxyde is a **next-generation desktop environment** written in Rust.  
-It blends the **ergonomics of macOS Aqua** with the **translucency and depth of Frutiger Aero**,  
-all while staying **lightweight, safe, and optimized for workflow**.
+Oxyde RT is a **branch of the Oxyde desktop environment** with a nostalgic twist—bringing back the **retro feel of early 2000s operating systems** without being Windows XP itself.  
 
 ---
 
-<p align="center">
-  <img src="/assets/icons/logo.png" alt="Oxyde Logo"/>
-</p>
+## ✨ Project Goals
+- Deliver a **lightweight, responsive desktop** with a classic XP-style experience.  
+- Provide **modern security and driver support** by running on the Linux kernel.  
+- Recreate the **look and feel** of early operating systems while keeping performance under tight memory usage.  
 
 ---
 
-# Project Mockup:
-<p>
-  <img src="/assets/oxyde_reender.png" alt="Oxyde Render Mockup"/>
-</p>
+## 🛠️ Technical Details
+- **Core Desktop:** Written in **Rust** for safety and performance.  
+- **Taskbar & File Manager:** Implemented in **C/C++** (for fun and to capture the retro coding spirit).  
+- **App Drawer:** Pops up with the <kbd>Win</kbd> key, offering quick access to installed applications.  
+- **Built-In File Manager:** Fully functional out of the box.  
 
 ---
 
-## ✨ Features (planned)
-
-- 🖥 **Wayland compositor** powered by [smithay](https://github.com/Smithay/smithay)  
-- 📑 **Global top menu bar** (Aqua-style, Fitts’s Law optimized)  
-- 📂 **Dock** with optional magnification, pinned apps, and running indicators  
-- 🔲 **Traffic-light window controls** (close / min / max)  
-- 🗂 **Workspaces & Exposé** — live window overview and smooth workspace switching  
-- 🔍 **OxySpot Launcher** — fast search for apps, files, and actions  
-- ⌨️ **Global shortcuts & hot corners**  
-- 🔔 **Notification center & preferences hub**  
-- 🎨 **Modern Frutiger Aero theming** — glass blur, neon accents, shadows, and springy animations  
+## 📅 Planned Features
+- System Settings Manager  
+- Resource Monitor  
+- Additional lightweight system apps  
 
 ---
 
-## 📦 Project Structure
-
-````text
-oxyde/
-  crates/
-    compositor/   # smithay-based WM/compositor
-    panel/        # global menu bar
-    dock/         # dock
-    expose/       # overview/workspaces
-    launcher/     # spotlight-style search
-    oxykeys/      # global shortcuts
-    oxymenu/      # app menu API
-    oxynotify/    # notifications
-    oxyconfig/    # preferences backend
-    theming/      # aero-glass, blur, glow
-  assets/
-    icons/
-    wallpapers/
-    fonts/
-  docs/
-  LICENSE
-````
----
-
-## 🚀 Getting Started
-
-Prerequisites
-
-  Rust (latest stable)
-
-  Wayland session (X11 not supported)
-
-  Dependencies: libinput, libudev, pkg-config
-
-
-## Build & Run
-
-```bash
-git clone https://github.com/0xy1de/oxyde.git
-```
-```bash
-cd oxyde
-```
-```bash
-cargo run --bin oxyde_compositor
-```
-
-
----
-
-## 🛠 Development Workflow
-
-Format code:
-
-``` cargo fmt ```
-
-Lint:
-
-``` cargo clippy ```
-
-Run tests:
-
- ``` cargo test ```
-
-
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see CONTRIBUTING.md for details.
-All contributions must follow the MPL-2.0 license terms.
-
-
----
-
-## 📜 License
-
-Source code: MPL-2.0
-
-Documentation: CC-BY-4.0
-
-Icons & artwork: CC-BY-SA-4.0
-
-Fonts: OFL-1.1
-
-
-
----
-
-## 🌟 Vision
-
-Oxyde is designed to be:
-
-Beautiful — polished visuals inspired by Aqua & Aero, modernized with Rust.
-
-Ergonomic — minimal friction, top-left menus, fast global search, sensible defaults.
-
-Lightweight — optimized compositor, efficient GPU pipelines, low memory overhead.
-
-Open — community-driven, transparent, and extensible.
-
-
-
----
+## ⚠️ Disclaimer
+This is **not Windows**.  
+Oxyde RT is an **independent project** designed to **recreate the aesthetics and nostalgia** of early 2000s desktops, powered by modern Linux foundations. The choice of C/C++ reflects the retro coding style used in XP-era software, not an attempt at direct compatibility.
