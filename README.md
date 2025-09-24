@@ -51,7 +51,20 @@ sudo apt install build-essential pkg-config wayland-protocols wayland-scanner li
 
 # Testing
 
+### Build task bar
+
+```bash
+cc -O2 -Wall -o bar_start bar_start.c \
+   xdg-shell-protocol.c \
+   wlr-layer-shell-unstable-v1-protocol.c \
+   $(pkg-config --cflags --libs wayland-client cairo)
+```
+
 ### Test with sway window:
+
+```bash
+sudo pacman -S sway
+```
 
 ```bash
 WLR_BACKENDS=x11 WLR_RENDERER=pixman sway -d -D noscanout &               ✔   

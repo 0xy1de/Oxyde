@@ -1,6 +1,13 @@
 // SPDX-FileCopyrightText: 2025 Oxyde Contributors
 // SPDX-License-Identifier: MPL-2.0
 
+
+// THIS IS A TEST
+// Fallback test for sanity purposes
+// Guaranteed to work...
+// Places blue bar at bottom of Wayland session
+
+
 #define _GNU_SOURCE 1
 #define _POSIX_C_SOURCE 200809L
 
