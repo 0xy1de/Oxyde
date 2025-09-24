@@ -1,4 +1,5 @@
-// layer-shell taskbar: Start + clock + window buttons (icon + title) for wlroots compositors
+
+// taskbar minimal with Start + clock + toplevel list (icons best-effort) + robust struct forward decls
 #define _GNU_SOURCE 1
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
@@ -21,6 +22,10 @@
 
 #include "wlr-layer-shell-unstable-v1-client-protocol.h"
 #include "wlr-foreign-toplevel-management-unstable-v1-client-protocol.h"
+#include "xdg-shell-client-protocol.h"
+
+// Forward-declare wlroots handle type in case headers order changes
+struct zwlr_foreign_toplevel_handle_v1;
 
 // ---- Globals
 static struct wl_display *dpy;
@@ -88,14 +93,14 @@ static cairo_surface_t *try_png(const char *p){
 }
 
 // quick icon theme lookup (hicolor + pixmaps)
-static const char* sizes[] = {"16","22","24","32","48"};
+static const char* sizes_arr[] = {"16","22","24","32","48"};
 static cairo_surface_t* load_icon_for_appid(const char *appid){
   if (!appid || !*appid) return NULL;
   char p[PATH_MAX];
-  for (size_t i=0;i<sizeof(sizes)/sizeof(sizes[0]);i++){
-    snprintf(p,sizeof(p),"/usr/share/icons/hicolor/%sx%s/apps/%s.png", sizes[i],sizes[i], appid);
+  for (size_t i=0;i<sizeof(sizes_arr)/sizeof(sizes_arr[0]);i++){
+    snprintf(p,sizeof(p),"/usr/share/icons/hicolor/%sx%s/apps/%s.png", sizes_arr[i],sizes_arr[i], appid);
     cairo_surface_t *s = try_png(p); if (s) return s;
-    snprintf(p,sizeof(p),"/usr/share/icons/hicolor/%sx%s/apps/%s-symbolic.png", sizes[i],sizes[i], appid);
+    snprintf(p,sizeof(p),"/usr/share/icons/hicolor/%sx%s/apps/%s-symbolic.png", sizes_arr[i],sizes_arr[i], appid);
     s = try_png(p); if (s) return s;
   }
   snprintf(p,sizeof(p),"/usr/share/pixmaps/%s.png", appid);
@@ -105,36 +110,22 @@ static cairo_surface_t* load_icon_for_appid(const char *appid){
 
 static cairo_surface_t *load_logo_flexible(int argc, char **argv) {
   char path[PATH_MAX];
-
   if (argc > 1) {
     strncpy(path, argv[1], sizeof(path)-1); path[sizeof(path)-1] = 0;
   } else {
-    // try <exe_dir>/../assets/icons/logo.png, then <exe_dir>/assets/icons/logo.png
     char exe[PATH_MAX] = {0};
     ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe)-1);
     if (n > 0) exe[n] = 0; else strcpy(exe, ".");
     char exe_copy[PATH_MAX]; strncpy(exe_copy, exe, sizeof(exe_copy)-1); exe_copy[sizeof(exe_copy)-1]=0;
     char *dir = dirname(exe_copy);
-
     snprintf(path, sizeof(path), "%s/../assets/icons/logo.png", dir);
     struct stat st;
-    if (stat(path, &st) != 0) {
-      snprintf(path, sizeof(path), "%s/assets/icons/logo.png", dir);
-    }
+    if (stat(path, &st) != 0) snprintf(path, sizeof(path), "%s/assets/icons/logo.png", dir);
   }
-
   struct stat st;
-  if (stat(path, &st) != 0) {
-    fprintf(stderr, "Logo stat('%s') failed: %s (placeholder used)\n", path, strerror(errno));
-    return NULL;
-  }
+  if (stat(path, &st) != 0) return NULL;
   cairo_surface_t *s = cairo_image_surface_create_from_png(path);
-  if (cairo_surface_status(s) != CAIRO_STATUS_SUCCESS) {
-    fprintf(stderr, "Logo PNG load failed (%s)\n", path);
-    cairo_surface_destroy(s);
-    return NULL;
-  }
-  fprintf(stderr, "Loaded logo: %s\n", path);
+  if (cairo_surface_status(s) != CAIRO_STATUS_SUCCESS) { cairo_surface_destroy(s); return NULL; }
   return s;
 }
 
@@ -161,7 +152,19 @@ static int clock_w_cached  = 80;
 static const int icon_px = 18;
 static const int btn_h_pad = 6;
 
-static void win_refresh_layout(void); // fwd
+static void compact_wins(void){
+  size_t j=0;
+  for (size_t i=0;i<wins_len;i++){
+    if (!wins[i]->closed) wins[j++] = wins[i];
+    else {
+      if (wins[i]->icon) cairo_surface_destroy(wins[i]->icon);
+      free(wins[i]->title);
+      free(wins[i]->appid);
+      free(wins[i]);
+    }
+  }
+  wins_len = j;
+}
 
 static void paint(void){
   // allocate buffer
@@ -179,11 +182,11 @@ static void paint(void){
                             CAIRO_FORMAT_RGB24, screen_w, bar_h, stride);
   cairo_t *cr = cairo_create(cs);
 
-  // background (XP-ish blue -> Win2000-ish slightly darker)
+  // background
   cairo_set_source_rgb(cr, 0.16, 0.36, 0.68);
   cairo_paint(cr);
 
-  // --- LEFT: Start button
+  // LEFT: Start button
   int pad = 6;
   int icon_box = bar_h - pad*2;  // square icon
   int icon_draw = icon_box;
@@ -207,8 +210,7 @@ static void paint(void){
   int hover = (ptr_x >= start_btn.x && ptr_x < start_btn.x + start_btn.w &&
                ptr_y >= start_btn.y && ptr_y < start_btn.y + start_btn.h);
 
-  if (hover) cairo_set_source_rgb(cr, 0.27, 0.52, 0.88);
-  else       cairo_set_source_rgb(cr, 0.20, 0.44, 0.80);
+  cairo_set_source_rgb(cr, hover ? 0.27:0.20, hover ? 0.52:0.44, hover ? 0.88:0.80);
   cairo_rectangle(cr, start_btn.x, btn_y, btn_w, btn_h);
   cairo_fill(cr);
 
@@ -233,7 +235,7 @@ static void paint(void){
   cairo_move_to(cr, text_x, text_y);
   cairo_show_text(cr, label);
 
-  // --- RIGHT: Clock
+  // RIGHT: Clock
   char now_buf[32];
   format_clock(now_buf);
   cairo_text_extents_t te;
@@ -243,51 +245,48 @@ static void paint(void){
   cairo_set_source_rgb(cr, 1, 1, 1);
   cairo_move_to(cr, cx, cy);
   cairo_show_text(cr, now_buf);
-  clock_w_cached = (int)te.width + 12; // keep some padding
+  clock_w_cached = (int)te.width + 12;
 
-  // --- CENTER: Window buttons
-int xbtn = left_pad + start_w_cached + 8;
-int avail = screen_w - right_pad - clock_w_cached - 8 - xbtn;
-int tb_h = bar_h - btn_h_pad;
-int tb_y = (bar_h - tb_h)/2;
+  // CENTER: Tasks
+  int xbtn = left_pad + start_w_cached + 8;
+  int avail = screen_w - right_pad - clock_w_cached - 8 - xbtn;
+  int tb_h = bar_h - btn_h_pad;
+  int tb_y = (bar_h - tb_h)/2;
 
-int visible = (int)wins_len;
-int each = visible ? (avail / visible) : 0;
-int minw = 120; if (visible && each < minw) each = avail / visible;
+  int visible = (int)wins_len;
+  int each = visible ? (avail / visible) : 0;
+  int minw = 120; if (visible && each < minw) each = avail / visible;
 
-cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-cairo_set_font_size(cr, 12.0);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 12.0);
 
   for (size_t i=0;i<wins_len;i++){
     struct win_btn *w = wins[i];
     if (w->closed) continue;
-
     int w_x = xbtn;
     int w_w = each > 0 ? each : 0;
     xbtn += w_w + 4;
 
     w->x = w_x; w->y = tb_y; w->w = w_w; w->h = tb_h;
 
-    // background + borders (Win2000 vibe)
     int hov = (ptr_x >= w->x && ptr_x < w->x + w->w && ptr_y >= w->y && ptr_y < w->y + w->h);
     cairo_set_source_rgb(cr, hov ? 0.27:0.22, hov ? 0.52:0.46, hov ? 0.88:0.76);
     cairo_rectangle(cr, w->x, w->y, w->w, w->h);
     cairo_fill(cr);
 
-    cairo_set_source_rgb(cr, 0.08, 0.18, 0.36); // dark outer
+    cairo_set_source_rgb(cr, 0.08, 0.18, 0.36);
     cairo_rectangle(cr, w->x+0.5, w->y+0.5, w->w-1, w->h-1);
     cairo_stroke(cr);
-    cairo_set_source_rgba(cr, 1,1,1, 0.15);     // inner highlight
+    cairo_set_source_rgba(cr, 1,1,1, 0.15);
     cairo_rectangle(cr, w->x+1.5, w->y+1.5, w->w-3, w->h-3);
     cairo_stroke(cr);
 
-    // icon
-    int ix = w->x + 6, iy = w->y + (w->h - icon_px)/2;
+    int ix = w->x + 6, iy = w->y + (w->h - 18)/2;
     if (!w->icon && w->appid) w->icon = load_icon_for_appid(w->appid);
     if (w->icon) {
       double iw = cairo_image_surface_get_width(w->icon);
       double ih = cairo_image_surface_get_height(w->icon);
-      double s = (double)icon_px / (iw > ih ? iw : ih);
+      double s = (double)18 / (iw > ih ? iw : ih);
       cairo_save(cr);
       cairo_translate(cr, ix, iy);
       cairo_scale(cr, s, s);
@@ -296,14 +295,13 @@ cairo_set_font_size(cr, 12.0);
       cairo_restore(cr);
     } else {
       cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
-      cairo_rectangle(cr, ix, iy, icon_px, icon_px);
+      cairo_rectangle(cr, ix, iy, 18, 18);
       cairo_fill(cr);
     }
 
-    // title
     const char *title = (w->title && *w->title) ? w->title :
                         (w->appid && *w->appid) ? w->appid : "(untitled)";
-    int tx = ix + icon_px + 6;
+    int tx = ix + 18 + 6;
     int tw = w->x + w->w - tx - 6;
     if (tw > 8) {
       cairo_set_source_rgb(cr, 1, 1, 1);
@@ -324,26 +322,7 @@ cairo_set_font_size(cr, 12.0);
   clock_buf[sizeof(clock_buf)-1] = 0;
 }
 
-static void compact_wins(void){
-  size_t j=0;
-  for (size_t i=0;i<wins_len;i++){
-    if (!wins[i]->closed) wins[j++] = wins[i];
-    else {
-      if (wins[i]->icon) cairo_surface_destroy(wins[i]->icon);
-      free(wins[i]->title);
-      free(wins[i]->appid);
-      free(wins[i]);
-    }
-  }
-  wins_len = j;
-}
-
-static void win_refresh_layout(void){
-  compact_wins();
-  paint();
-}
-
-// ----------------- listeners -----------------
+// ----------------- protocol + events -----------------
 static void lsurf_config(void *data, struct zwlr_layer_surface_v1 *ls,
                          uint32_t serial, uint32_t w, uint32_t h){
   if (w > 0) screen_w = (int)w;
@@ -368,21 +347,17 @@ static const struct wl_registry_listener reg_listener = { reg_global, reg_global
 
 // foreign toplevel callbacks
 static void tl_title(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, const char *title){
-  size_t n = title ? strlen(title) : 0;
-  fprintf(stderr, "[ftm] title(len=%zu): \"%.*s\"", n, (int)n, title ? title : "");
+  size_t n_title = title ? strlen(title) : 0;
+  fprintf(stderr, "[ftm] title(len=%zu): \"%.*s\"\n", n_title, (int)n_title, title ? title : "");
   fflush(stderr);
-  
   struct win_btn *w = d; free(w->title); w->title = title ? strdup(title) : strdup("");
-  win_refresh_layout();
+  paint();
 }
 static void tl_appid(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, const char *appid){
-  size_t n = appid ? strlen(appid) : 0;
-  fprintf(stderr, "[ftm] appid(len=%zu): \"%.*s\"", n, (int)n, appid ? appid : "");
+  size_t n_app = appid ? strlen(appid) : 0;
+  fprintf(stderr, "[ftm] appid(len=%zu): \"%.*s\"\n", n_app, (int)n_app, appid ? appid : "");
   fflush(stderr);
-  
-  struct win_btn *w = d; free(w->appid); w->appid = appid ? strdup(appid) : strdup("");
-  // icon lazy-loaded in paint()
-  win_refresh_layout();
+  struct win_btn *w = d; free(w->appid); w->appid = appid ? strdup(appid) : strdup(""); paint();
 }
 static void tl_state(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, struct wl_array *state){ (void)d;(void)h;(void)state; }
 static void tl_parent(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, struct zwlr_foreign_toplevel_handle_v1 *p){ (void)d;(void)h;(void)p; }
@@ -390,7 +365,7 @@ static void tl_output_enter(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, 
 static void tl_output_leave(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, struct wl_output *o){ (void)d;(void)h;(void)o; }
 static void tl_done(void *d, struct zwlr_foreign_toplevel_handle_v1 *h){ (void)d;(void)h; }
 static void tl_closed(void *d, struct zwlr_foreign_toplevel_handle_v1 *h){
-  struct win_btn *w = d; w->closed = 1; win_refresh_layout();
+  struct win_btn *w = d; w->closed = 1; paint();
 }
 static const struct zwlr_foreign_toplevel_handle_v1_listener tl_listener = {
   .title = tl_title,
@@ -407,13 +382,12 @@ static void ftm_new(void *d, struct zwlr_foreign_toplevel_manager_v1 *mgr,
                     struct zwlr_foreign_toplevel_handle_v1 *hdl){
   fprintf(stderr, "[ftm] new toplevel handle=%p\n", (void*)hdl);
   fflush(stderr);
-  
   if (wins_len == wins_cap) { wins_cap = wins_cap? wins_cap*2:8; wins = realloc(wins, wins_cap*sizeof*wins); }
   struct win_btn *w = calloc(1,sizeof* w);
   w->hdl = hdl;
   zwlr_foreign_toplevel_handle_v1_add_listener(hdl, &tl_listener, w);
   wins[wins_len++] = w;
-  win_refresh_layout();
+  paint();
 }
 static void ftm_finished(void *d, struct zwlr_foreign_toplevel_manager_v1 *mgr){ (void)d;(void)mgr; }
 static const struct zwlr_foreign_toplevel_manager_v1_listener ftm_listener = {
@@ -443,13 +417,11 @@ static void ptr_button(void *d, struct wl_pointer *p, uint32_t serial, uint32_t 
   (void)d; (void)p; (void)serial; (void)time;
   const uint32_t BTN_LEFT = 0x110; // linux/input-event-codes.h
   if (button == BTN_LEFT && state == 1) { // press
-    // Start button
     if (ptr_x >= start_btn.x && ptr_x < start_btn.x + start_btn.w &&
         ptr_y >= start_btn.y && ptr_y < start_btn.y + start_btn.h) {
       fprintf(stderr, "Start clicked!\n");
       return;
     }
-    // Window button
     for (size_t i=0;i<wins_len;i++){
       struct win_btn *w = wins[i];
       if (w->closed) continue;
@@ -500,15 +472,15 @@ int main(int argc, char **argv){
     return 1;
   }
   if (seat) wl_seat_add_listener(seat, &seat_listener, NULL);
-  if (ftm)  {zwlr_foreign_toplevel_manager_v1_add_listener(ftm, &ftm_listener, NULL);
-  wl_display_roundtrip(dpy);
+  if (ftm) {
+    zwlr_foreign_toplevel_manager_v1_add_listener(ftm, &ftm_listener, NULL);
+    wl_display_roundtrip(dpy); // pull existing windows now
   }
 
   // surface
   surf = wl_compositor_create_surface(comp);
   lsurf = zwlr_layer_shell_v1_get_layer_surface(layer, surf, NULL,
             ZWLR_LAYER_SHELL_V1_LAYER_TOP, "bar-tasklist");
-  // bottom dock
   zwlr_layer_surface_v1_set_anchor(lsurf,
       ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM |
       ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT   |
@@ -518,7 +490,6 @@ int main(int argc, char **argv){
   zwlr_layer_surface_v1_add_listener(lsurf, &lsurf_listener, NULL);
   wl_surface_commit(surf);
 
-  // initial configure + first paint
   wl_display_roundtrip(dpy);
 
   // 1s clock
@@ -529,7 +500,6 @@ int main(int argc, char **argv){
   if (timerfd_settime(tfd, 0, &its, NULL) < 0) { perror("timerfd_settime"); return 1; }
   format_clock(clock_buf);
 
-  // event loop
   struct pollfd fds[2];
   fds[0].fd = wl_display_get_fd(dpy); fds[0].events = POLLIN;
   fds[1].fd = tfd;                    fds[1].events = POLLIN;
@@ -549,7 +519,6 @@ int main(int argc, char **argv){
     }
   }
 
-  // cleanup (never reached in normal run)
   if (logo) cairo_surface_destroy(logo);
   if (tfd >= 0) close(tfd);
   return 0;

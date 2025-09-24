@@ -90,6 +90,13 @@ chmod +x taskbar/launch_sway.sh
       ```
 
       To stop:
-      `ctrl+c`
+
+      ` ctrl+C `
+
+      #Alacritty window manager test:
+
+      ```bash
+      WAYLAND_DISPLAY="wayland-#" alacritty &
+      ```
 
    # Rebuild after any changes
