@@ -246,17 +246,17 @@ static void paint(void){
   clock_w_cached = (int)te.width + 12; // keep some padding
 
   // --- CENTER: Window buttons
-  int xbtn = left_pad + start_w_cached + 8;
-  int avail = screen_w - right_pad - clock_w_cached - 8 - xbtn;
-  int tb_h = bar_h - btn_h_pad;
-  int tb_y = (bar_h - tb_h)/2;
+int xbtn = left_pad + start_w_cached + 8;
+int avail = screen_w - right_pad - clock_w_cached - 8 - xbtn;
+int tb_h = bar_h - btn_h_pad;
+int tb_y = (bar_h - tb_h)/2;
 
-  int visible = (int)wins_len;
-  int each = visible ? (avail / visible) : 0;
-  int minw = 120; if (visible && each < minw) each = avail / visible;
+int visible = (int)wins_len;
+int each = visible ? (avail / visible) : 0;
+int minw = 120; if (visible && each < minw) each = avail / visible;
 
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(cr, 12.0);
+cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+cairo_set_font_size(cr, 12.0);
 
   for (size_t i=0;i<wins_len;i++){
     struct win_btn *w = wins[i];
@@ -368,10 +368,18 @@ static const struct wl_registry_listener reg_listener = { reg_global, reg_global
 
 // foreign toplevel callbacks
 static void tl_title(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, const char *title){
+  size_t n = title ? strlen(title) : 0;
+  fprintf(stderr, "[ftm] title(len=%zu): \"%.*s\"", n, (int)n, title ? title : "");
+  fflush(stderr);
+  
   struct win_btn *w = d; free(w->title); w->title = title ? strdup(title) : strdup("");
   win_refresh_layout();
 }
 static void tl_appid(void *d, struct zwlr_foreign_toplevel_handle_v1 *h, const char *appid){
+  size_t n = appid ? strlen(appid) : 0;
+  fprintf(stderr, "[ftm] appid(len=%zu): \"%.*s\"", n, (int)n, appid ? appid : "");
+  fflush(stderr);
+  
   struct win_btn *w = d; free(w->appid); w->appid = appid ? strdup(appid) : strdup("");
   // icon lazy-loaded in paint()
   win_refresh_layout();
@@ -397,6 +405,9 @@ static const struct zwlr_foreign_toplevel_handle_v1_listener tl_listener = {
 
 static void ftm_new(void *d, struct zwlr_foreign_toplevel_manager_v1 *mgr,
                     struct zwlr_foreign_toplevel_handle_v1 *hdl){
+  fprintf(stderr, "[ftm] new toplevel handle=%p\n", (void*)hdl);
+  fflush(stderr);
+  
   if (wins_len == wins_cap) { wins_cap = wins_cap? wins_cap*2:8; wins = realloc(wins, wins_cap*sizeof*wins); }
   struct win_btn *w = calloc(1,sizeof* w);
   w->hdl = hdl;
@@ -490,7 +501,7 @@ int main(int argc, char **argv){
   }
   if (seat) wl_seat_add_listener(seat, &seat_listener, NULL);
   if (ftm)  {zwlr_foreign_toplevel_manager_v1_add_listener(ftm, &ftm_listener, NULL);
-    wl_display_roundtrip(dpy);
+  wl_display_roundtrip(dpy);
   }
 
   // surface
