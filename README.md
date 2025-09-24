@@ -54,11 +54,12 @@ sudo apt install build-essential pkg-config wayland-protocols wayland-scanner li
 ### Build task bar
 
 ```bash
-cc -O2 -Wall -o bar_start bar_start.c \
-   xdg-shell-protocol.c \
-   wlr-layer-shell-unstable-v1-protocol.c \
-   wlr-foreign-toplevel-management-unstable-v1-protocol.c \
-   $(pkg-config --cflags --libs wayland-client cairo)
+cc -std=c11 -O2 -Wall -o bar_start \
+  bar_start.c \
+  xdg-shell-protocol.c \
+  wlr-layer-shell-unstable-v1-protocol.c \
+  wlr-foreign-toplevel-management-unstable-v1-protocol.c \
+  $(pkg-config --cflags --libs wayland-client cairo)
 ```
 
 ### Test with sway window:
@@ -72,31 +73,36 @@ chmod +x taskbar/launch_sway.sh
 ./taskbar/launch_sway.sh  
 ```
 
-#Taskbar probably wont open yet...
-   Check log for wayland session number (`wayland-*`)
-   In `Sway` session:
-      Open terminal (`ctrl+alt+t`)
+---
 
-      ```bash
-      cd ~/path/to/taskbar
-      ```
-      ```bash
-      cd ~/source/Oxyde/taskbar
-      ```
-      Run:
+# Taskbar probably wont open yet...
 
-      ```bash
-      WAYLAND_DISPLAY="wayland-#" ./bar_start
-      ```
+Check log for wayland session number (`wayland-*`)
+In `Sway` session:
+   Open terminal (`ctrl+alt+t`)
 
-      To stop:
+   ```bash
+   cd ~/path/to/taskbar
+   ```
 
-      ` ctrl+C `
+   ```bash
+   cd ~/source/Oxyde/taskbar
+   ```
 
-      #Alacritty window manager test:
+   Run:
 
-      ```bash
-      WAYLAND_DISPLAY="wayland-#" alacritty &
-      ```
+   ```bash
+   WAYLAND_DISPLAY="wayland-#" ./bar_start
+   ```
 
-   # Rebuild after any changes
+   To stop:
+
+   `Ctrl+C`
+
+ # Alacritty window manager test:
+
+   ```bash
+   WAYLAND_DISPLAY="wayland-#" alacritty &
+   ```
+
+# Rebuild after any changes
