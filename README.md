@@ -27,6 +27,11 @@ Oxyde RT is a **branch of the Oxyde desktop environment** with a nostalgic twist
 
 ---
 
+## Current Progress as of 09/24/2025:
+Still Have A Lot to do.....
+
+![Screenshot](assets/progress.png)
+
 ## ⚠️ Disclaimer
 This is **not Windows**.  
 Oxyde RT is an **independent project** designed to **recreate the aesthetics and nostalgia** of early 2000s desktops, powered by modern Linux foundations. The choice of C/C++ reflects the retro coding style used in XP-era software, not an attempt at direct compatibility.
