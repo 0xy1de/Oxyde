@@ -49,3 +49,14 @@ sudo pacman -S base-devel wayland wayland-protocols wayland-utils
 sudo apt install build-essential pkg-config wayland-protocols wayland-scanner libwayland-dev
 ```
 
+# Testing
+
+### Test with sway window:
+
+```bash
+WLR_BACKENDS=x11 WLR_RENDERER=pixman sway -d -D noscanout &               ✔   
+
+ls "$XDG_RUNTIME_DIR"/wayland-*
+
+WAYLAND_DISPLAY=wayland-1 ./taskbar  
+```

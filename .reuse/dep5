@@ -7,7 +7,7 @@ Files: *
 Copyright: 2025 Oxyde Contributors
 License: MPL-2.0
 
-Files: crates/** assets/icons/** assets/wallpapers/** docs/** examples/**
+Files: crates/** assets/icons/** assets/wallpapers/** docs/** examples/** taskbar/** oxyde/**
 Copyright: 2025 Oxyde Contributors
 License: MPL-2.0
 
