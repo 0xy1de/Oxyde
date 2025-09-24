@@ -67,9 +67,28 @@ sudo pacman -S sway
 ```
 
 ```bash
-WLR_BACKENDS=x11 WLR_RENDERER=pixman sway -d -D noscanout &
-
-ls "$XDG_RUNTIME_DIR"/wayland-*
-
-WAYLAND_DISPLAY=wayland-1 ./taskbar  
+chmod +x taskbar/launch_sway.sh
+./taskbar/launch_sway.sh  
 ```
+
+#Taskbar probably wont open yet...
+   Check log for wayland session number (`wayland-*`)
+   In `Sway` session:
+      Open terminal (`ctrl+alt+t`)
+
+      ```bash
+      cd ~/path/to/taskbar
+      ```
+      ```bash
+      cd ~/source/Oxyde/taskbar
+      ```
+      Run:
+
+      ```bash
+      WAYLAND_DISPLAY="wayland-#" ./bar_start
+      ```
+
+      To stop:
+      `ctrl+c`
+
+   # Rebuild after any changes
