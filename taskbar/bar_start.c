@@ -216,7 +216,7 @@ static const struct wl_seat_listener seat_listener = { seat_cap, seat_name };
 // ---- main
 int main(int argc, char **argv){
   // load icon BEFORE connecting (path is relative to cwd)
-  const char *icon_path = "/taskbar/icons/logo.png";
+  const char *icon_path = "/home/nick/source/Oxyde/assets/icons/logo.png";
   logo = cairo_image_surface_create_from_png(icon_path);
   if (cairo_surface_status(logo) != CAIRO_STATUS_SUCCESS) {
     fprintf(stderr, "Warning: failed to load %s; using placeholder\n", icon_path);

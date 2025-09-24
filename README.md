@@ -67,7 +67,7 @@ sudo pacman -S sway
 ```
 
 ```bash
-WLR_BACKENDS=x11 WLR_RENDERER=pixman sway -d -D noscanout &               ✔   
+WLR_BACKENDS=x11 WLR_RENDERER=pixman sway -d -D noscanout &
 
 ls "$XDG_RUNTIME_DIR"/wayland-*
 
