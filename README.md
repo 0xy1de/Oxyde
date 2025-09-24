@@ -57,6 +57,7 @@ sudo apt install build-essential pkg-config wayland-protocols wayland-scanner li
 cc -O2 -Wall -o bar_start bar_start.c \
    xdg-shell-protocol.c \
    wlr-layer-shell-unstable-v1-protocol.c \
+   wlr-foreign-toplevel-management-unstable-v1-protocol.c \
    $(pkg-config --cflags --libs wayland-client cairo)
 ```
 
