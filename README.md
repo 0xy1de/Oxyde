@@ -30,3 +30,22 @@ Oxyde RT is a **branch of the Oxyde desktop environment** with a nostalgic twist
 ## ⚠️ Disclaimer
 This is **not Windows**.  
 Oxyde RT is an **independent project** designed to **recreate the aesthetics and nostalgia** of early 2000s desktops, powered by modern Linux foundations. The choice of C/C++ reflects the retro coding style used in XP-era software, not an attempt at direct compatibility.
+
+---
+
+# Getting started:
+
+## Prerequesities:
+
+### Arch:
+
+```bash
+sudo pacman -S base-devel wayland wayland-protocols wayland-utils
+```
+
+### Debian / Ubuntu:
+
+```bash
+sudo apt install build-essential pkg-config wayland-protocols wayland-scanner libwayland-dev
+```
+
