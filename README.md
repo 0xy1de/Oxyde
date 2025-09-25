@@ -59,8 +59,8 @@ sudo apt install build-essential pkg-config wayland-protocols wayland-scanner li
 ### Build task bar
 
 ```bash
-cc -std=c11 -O2 -Wall -o bar_start \
-  bar_start.c \
+cc -std=c11 -O2 -Wall -o bar_y2k \
+  bar_y2k.c \
   xdg-shell-protocol.c \
   wlr-layer-shell-unstable-v1-protocol.c \
   wlr-foreign-toplevel-management-unstable-v1-protocol.c \
@@ -97,7 +97,7 @@ In `Sway` session:
    Run:
 
    ```bash
-   WAYLAND_DISPLAY="wayland-#" ./bar_start
+   WAYLAND_DISPLAY="wayland-1" ./bar_y2k
    ```
 
    To stop:
@@ -107,7 +107,7 @@ In `Sway` session:
  # Alacritty window manager test:
 
    ```bash
-   WAYLAND_DISPLAY="wayland-#" alacritty &
+   WAYLAND_DISPLAY="wayland-1" alacritty &
    ```
 
 # Rebuild after any changes
