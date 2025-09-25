@@ -49,13 +49,13 @@ static cairo_surface_t *logo = NULL;
 static int tfd = -1;
 static char clock_buf[32] = "";
 
-// ---------- Win2000-ish palette ----------
+// ---------- Y2k palette ----------
 static const struct { double r,g,b; } COL_BG      = {0.82, 0.82, 0.82}; // taskbar base grey
-static const struct { double r,g,b; } COL_BEVEL_H = {1.00, 1.00, 1.00}; // top/left highlight
+static const struct { double r,g,b; } COL_BEVEL_H = {1.00, 1.00, 1.00}; // top/left highlightY palette -
 static const struct { double r,g,b; } COL_BEVEL_S = {0.55, 0.55, 0.55}; // bottom/right shadow
 static const struct { double r,g,b; } COL_BTN     = {0.86, 0.86, 0.86}; // button face
-static const struct { double r,g,b; } COL_BTN_HOV = {0.29, 0.56, 0.86}; // aqua hover
-static const struct { double r,g,b; } COL_BTN_ACT = {0.18, 0.40, 0.76}; // active (deeper aqua)
+static const struct { double r,g,b; } COL_BTN_HOV = {0.137, 0.769, 0.878}; // aqua hover
+static const struct { double r,g,b; } COL_BTN_ACT = {0.106, 0.608, 0.702}; // active (deeper aqua)
 static const struct { double r,g,b; } COL_TEXT    = {0.07, 0.07, 0.07}; // dark text
 static const struct { double r,g,b; } COL_TEXT_INV= {1.00, 1.00, 1.00}; // inverse text (on aqua)
 static const struct { double r,g,b; } COL_BOX     = {0.90, 0.90, 0.90}; // right clock box fill
