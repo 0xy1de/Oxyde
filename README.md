@@ -27,7 +27,7 @@ Oxyde RT is a **branch of the Oxyde desktop environment** with a nostalgic twist
 
 ---
 
-## Current Progress as of 09/24/2025:
+## Current Progress as of 09/26/2025:
 Still Have A Lot to do.....
 
 ![Screenshot](assets/progress.png)
